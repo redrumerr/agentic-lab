@@ -1,0 +1,17 @@
+repo = ENV.fetch("LAB_REPO_ROOT", File.expand_path("..", __dir__))
+setup = ENV.fetch("LAB_SETUP_SCRIPT", File.join(repo, "vm", "setup.sh"))
+
+Vagrant.configure("2") do |config|
+  config.vm.box = ENV.fetch("LAB_VAGRANT_BOX", "bento/ubuntu-24.04")
+  config.vm.hostname = "atlas-agent-lab"
+  # A distributable builder VM must retain the base box's bootstrap SSH key.
+  config.ssh.insert_key = false if ENV["LAB_BUILD_ESCAPE_BOX"] == "1"
+  config.vm.network "forwarded_port", guest: 22, host: 2222, host_ip: "127.0.0.1", id: "ssh", auto_correct: true
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder repo, "/workspace", mount_options: ["ro"]
+  config.vm.provider "virtualbox" do |vb|
+    vb.cpus = 2
+    vb.memory = 4096
+  end
+  config.vm.provision "shell", path: setup, privileged: true, env: { "LAB_ESCAPE_PROFILE" => ENV.fetch("LAB_ESCAPE_PROFILE", ""), "LAB_OPENCLAW_VERSION" => ENV.fetch("LAB_OPENCLAW_VERSION", ""), "LAB_OPENCLAW_COMMAND" => ENV.fetch("LAB_OPENCLAW_COMMAND", "") }
+end

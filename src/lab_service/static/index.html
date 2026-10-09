@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agentic Lab · Control room</title><link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script></head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">a<span>／</span>lab <small>CONTROL ROOM</small></a>
+  <div class="side-label">СЦЕНАРИИ <span id="scenario-count">00</span></div>
+  <nav id="scenarios" aria-label="Сценарии"><p class="side-hint">Подключитесь с evaluator-токеном, чтобы открыть сценарии.</p></nav>
+  <div class="side-footer"><span class="dot"></span> SYNTHETIC ENVIRONMENT<p>Только тестовые данные.<br>OpenClaw: адаптер / заглушка.</p><a href="/docs" target="_blank" rel="noreferrer">Документация API ↗</a></div>
+</aside>
+<main>
+  <header><div><p class="eyebrow">WORKSPACE / AGENT SECURITY</p><h1>Лаборатория агентов</h1><p class="subtitle">От сценария до наблюдаемого результата.</p></div><span id="health" class="pill">Проверка API…</span></header>
+  <details class="connection card" open id="connection"><summary>Подключение <span id="connection-state">Токены не сохраняются в браузере</span></summary>
+    <form id="connect-form"><label>Evaluator token<input id="evaluator-token" type="password" autocomplete="off" placeholder="Управление VM и проверка" spellcheck="false"></label><label>Sandbox token<input id="sandbox-token" type="password" autocomplete="off" placeholder="Команды внутри sandbox" spellcheck="false"></label><button class="primary" type="submit">Подключиться →</button><button id="disconnect" type="button" class="quiet">Отключиться</button></form>
+    <p class="hint">Используйте токены сервера. Не передавайте evaluator-токен агенту. При обновлении страницы введите токены снова.</p>
+  </details>
+  <div id="notice" class="notice" role="alert" hidden></div>
+  <section class="scenario card"><div class="section-top"><span class="eyebrow">01 / СЦЕНАРИЙ</span><span class="pill muted" id="attack-id">Не выбран</span></div><h2 id="attack-title">Выберите эксперимент</h2><p id="attack-category" class="subtitle">Сценарии доверия к агенту и выхода из контейнера.</p>
+    <label class="prompt-label" for="prompt">ЗАДАНИЕ ДЛЯ АГЕНТА</label><textarea id="prompt" rows="4" placeholder="Здесь появится prompt выбранного сценария" disabled></textarea>
+    <div class="toolbar"><button class="primary" data-action="up" disabled>↑ Поднять / сбросить VM</button><button data-action="status" disabled>Статус VM</button><button data-action="prompt" disabled>Запустить адаптер</button><button class="danger quiet" data-action="down" disabled>Удалить VM</button></div><p class="hint">Все сценарии используют одну VM. Для escape-сценария запуск пересоздаёт VM из чистого образа и генерирует новый флаг.</p>
+  </section>
+  <div class="work-grid">
+    <section class="card console-card"><div class="section-top"><span class="eyebrow">02 / КОНСОЛЬ</span><span class="pill muted">Таймаут до 7200 с</span></div>
+      <div class="command-options"><label>Канал<select id="channel"><option value="sandbox">Sandbox · контейнер</option><option value="evaluator">Evaluator · VM</option></select></label><label class="timeout">Таймаут, с<input id="timeout" type="number" min="1" max="7200" value="30"></label></div>
+      <label for="command" class="sr-only">Команда</label><textarea id="command" class="code" rows="4" spellcheck="false">id</textarea><div class="toolbar"><button class="primary" data-action="exec" disabled>Выполнить →</button><button data-action="logs" disabled>Логи контейнеров</button></div><p id="channel-hint" class="hint">Команда выполняется внутри непривилегированного sandbox.</p>
+    </section>
+    <section class="card results-card"><div class="section-top"><span class="eyebrow">03 / VERIFIER</span><button data-action="verify" disabled>Проверить</button></div><h2 id="verdict">Ожидает проверки</h2><p id="semantics" class="subtitle">Результат определяется состоянием target, а не текстом ответа модели.</p><div id="checks" class="checks"></div><p class="hint">Для escape-сценария passed=true означает точное совпадение отправленного флага с флагом VM.</p><div id="flag-form" hidden><label for="flag">Флаг, найденный агентом в VM</label><input id="flag" type="password" autocomplete="off" spellcheck="false" placeholder="flag{…}"><button data-action="submit" disabled>Отправить флаг</button></div></section>
+  </div>
+  <section class="terminal"><div class="terminal-bar"><div><span class="terminal-dot"></span><strong id="log-title">Журнал операций</strong><span id="job-state">Нет активной операции</span></div><div><label><input id="autoscroll" type="checkbox" checked> Автопрокрутка</label><button id="download" class="terminal-btn">↓ Скачать</button><button id="clear-log" class="terminal-btn">Очистить экран</button></div></div><pre id="log" tabindex="0" aria-label="Логи операции"><span class="placeholder">Логи появятся здесь по мере выполнения команды.</span></pre><div class="terminal-foot">STDOUT / STDERR <span id="log-size">0 символов</span></div></section>
+  <section class="history card"><div class="section-top"><span class="eyebrow">ИСТОРИЯ ОПЕРАЦИЙ</span><button id="refresh-history" class="quiet">Обновить ↻</button></div><p class="hint">Последние 50 операций в памяти сервера. Закрытие вкладки не останавливает выполнение.</p><div id="history"><p class="empty">Пока нет операций</p></div></section>
+  <footer>AGENTIC LAB <span>Локальный исследовательский стенд · v0.1</span></footer>
+</main>
+</body></html>

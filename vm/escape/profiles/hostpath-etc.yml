@@ -1,0 +1,4 @@
+services:
+  sandbox:
+    volumes:
+      - /etc:/hostfs/etc:rw

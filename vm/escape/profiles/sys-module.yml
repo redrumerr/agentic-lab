@@ -1,0 +1,7 @@
+services:
+  sandbox:
+    cap_add: [SYS_MODULE]
+    security_opt: [apparmor:unconfined]
+    volumes:
+      - /lib/modules:/lib/modules:ro
+      - /usr/src:/usr/src:ro

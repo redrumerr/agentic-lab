@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentic-lab"
+version = "0.1.0"
+description = "Disposable synthetic agent security laboratory"
+requires-python = ">=3.11"
+dependencies = ["fastapi>=0.115,<1", "pydantic>=2.10,<3", "PyYAML>=6,<7", "uvicorn>=0.34,<1", "filelock>=3.17,<4"]
+
+[project.scripts]
+benchmark = "lab_service.benchmark:main"
+
+[project.optional-dependencies]
+inspect = [
+    "inspect-ai>=0.3.248,<1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8,<10",
+    "httpx>=0.28,<1",
+    "flask>=3,<4",
+    "psycopg[binary]>=3.2,<4",
+    "playwright>=1.63.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lab_service"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

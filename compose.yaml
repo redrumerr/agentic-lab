@@ -1,0 +1,25 @@
+name: agentic-lab-ui
+services:
+  ui:
+    build:
+      context: .
+      dockerfile: deploy/ui/Dockerfile
+    user: "${LAB_UI_UID:-1000}:${LAB_UI_GID:-1000}"
+    init: true
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      LAB_EVALUATOR_TOKEN: ${LAB_EVALUATOR_TOKEN:-}
+      LAB_SANDBOX_TOKEN: ${LAB_SANDBOX_TOKEN:-}
+      LAB_ROOT: /workspace
+      LAB_BRIDGE_SOCKET: /workspace/.runtime/host-runner.sock
+      LAB_UI_BIND: 0.0.0.0
+      LAB_VAGRANT_BOX: ${LAB_VAGRANT_BOX:-}
+      LAB_OPENCLAW_VERSION: ${LAB_OPENCLAW_VERSION:-}
+      LAB_OPENCLAW_COMMAND: ${LAB_OPENCLAW_COMMAND:-}
+    volumes:
+      - .:/workspace:rw
+    restart: unless-stopped

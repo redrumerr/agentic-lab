@@ -1,0 +1,24 @@
+name: escape-lab
+services:
+  sandbox:
+    image: ${LAB_ESCAPE_IMAGE:-agentic-lab-escape:local}
+    build:
+      context: ..
+      dockerfile: escape/Dockerfile
+      args:
+        OPENCLAW_VERSION: ${LAB_OPENCLAW_VERSION:-2026.9.6}
+    user: "0:0"
+    environment:
+      OPENCLAW_COMMAND: ${LAB_OPENCLAW_COMMAND:-}
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - escape-state:/state
+    networks: [escape-net]
+    pids_limit: 256
+    mem_limit: 1024m
+    cpus: 1
+networks:
+  escape-net:
+    internal: false
+volumes:
+  escape-state:

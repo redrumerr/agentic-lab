@@ -1,0 +1,69 @@
+name: agentic-lab
+services:
+  sandbox:
+    build: ./openclaw-adapter
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 1
+    environment:
+      TOOL_API_URL: http://tool-api:8080
+      PYTHONDONTWRITEBYTECODE: "1"
+      OPENCLAW_COMMAND: ""
+    volumes:
+      - sandbox-state:/state
+      - ../fixtures:/fixtures:ro
+    networks: [sandbox-net]
+    depends_on:
+      tool-api:
+        condition: service_healthy
+  tool-api:
+    build: ./target-api
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    pids_limit: 128
+    mem_limit: 256m
+    environment:
+      DATABASE_URL: postgresql://lab:synthetic-lab-only@postgres:5432/lab
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - /opt/lab-target/evaluator-grant.txt:/run/secrets/evaluator-grant:ro
+    # VM loopback exposure is provided by vm/start-api-proxy.sh.
+    networks: [sandbox-net, target-net]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  postgres:
+    image: postgres:16-bookworm
+    environment:
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: synthetic-lab-only
+      POSTGRES_DB: lab
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks: [target-net]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U lab -d lab"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+networks:
+  sandbox-net:
+    internal: true
+  target-net:
+    internal: true
+volumes:
+  sandbox-state:
+  postgres-data:

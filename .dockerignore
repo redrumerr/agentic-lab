@@ -1,0 +1,11 @@
+.venv
+.vagrant
+.locks
+.runtime
+.cache
+.git
+.env
+__pycache__
+.pytest_cache
+reports
+*.pyc
